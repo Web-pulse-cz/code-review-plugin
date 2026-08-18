@@ -1,7 +1,7 @@
 ---
 description: Review the current diff (or given target) and report severity-tagged findings with fixes.
-argument-hint: "[target: staged | HEAD~1 | <branch> | <file...>] [--fix]"
-allowed-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(git merge-base:*), Edit, Agent
+argument-hint: "[target: current | staged | HEAD~1 | <branch> | <file...>] [--fix]"
+allowed-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(git merge-base:*), Bash(git symbolic-ref:*), Edit, Agent
 ---
 
 # Code review
@@ -14,6 +14,7 @@ Target: `$ARGUMENTS` (empty → uncommitted working-tree changes).
 
 2. **Resolve the diff.**
    - No args → `git status --short` then `git diff` (plus `git diff --staged`).
+   - `current` → the whole current branch, committed and uncommitted alike. Find the base (`git symbolic-ref refs/remotes/origin/HEAD` or fall back to `main`/`master`), then `git diff $(git merge-base HEAD <base>)` (two dots, base against the working tree — not `...HEAD`, which would drop uncommitted changes) plus `git status --short` for untracked files.
    - `staged` → `git diff --staged`.
    - A branch name → `git diff $(git merge-base HEAD <branch>)...HEAD`.
    - A commit-ish (`HEAD~1`, sha) → `git diff <commit-ish>`.
