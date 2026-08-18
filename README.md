@@ -6,7 +6,7 @@ Structured code review for Claude Code. Reviews the current diff, a branch, or s
 
 | Piece | Type | Purpose |
 | --- | --- | --- |
-| `/review` | command | Entry point. Loads project `agents/` rules if present, resolves the diff, reviews it, reports findings. `--fix` applies 🔴 critical ones. |
+| `/cr` | command | Entry point. Loads project `agents/` rules if present, resolves the diff, reviews it, reports findings. `--fix` applies 🔴 critical ones. |
 | `code-reviewer` | agent | Read-only reviewer. Auto-invoked for larger diffs, or callable directly. |
 | `review-checklist` | skill | Stack-specific failure modes (PHP, Symfony, Laravel, TS/React, SQL, shell). |
 
@@ -27,18 +27,27 @@ If the target repo has an `agents/` folder — including nested subfolders to an
 
 ## Install
 
-The plugin directory doubles as its own marketplace, so a local install is two steps:
+Published at [Web-pulse-cz/code-review-plugin](https://github.com/Web-pulse-cz/code-review-plugin). Install from anywhere with:
 
 ```bash
-claude plugin marketplace add /Users/martinhanzl/PhpstormProjects/code-review-plugin
+claude plugin marketplace add Web-pulse-cz/code-review-plugin
 claude plugin install code-review-plugin@code-review-plugin
 ```
 
-Check the manifest before installing, and confirm it loaded after:
+Confirm it loaded:
 
 ```bash
-claude plugin validate /Users/martinhanzl/PhpstormProjects/code-review-plugin
 claude plugin list
+```
+
+### Local dev install
+
+Working on this repo locally? Point the marketplace at your working copy instead — the plugin directory doubles as its own marketplace:
+
+```bash
+claude plugin marketplace add /path/to/code-review-plugin
+claude plugin install code-review-plugin@code-review-plugin
+claude plugin validate /path/to/code-review-plugin
 ```
 
 Edits to the files take effect on the next Claude Code session — no reinstall needed while the marketplace points at this directory.
@@ -46,13 +55,13 @@ Edits to the files take effect on the next Claude Code session — no reinstall 
 ## Usage
 
 ```
-/review                    # uncommitted working-tree changes
-/review current            # current branch vs. its base, committed + uncommitted
-/review staged             # staged changes only
-/review main               # everything on this branch since main
-/review HEAD~3             # last three commits
-/review src/auth.ts        # specific files
-/review main --fix         # review, then apply only 🔴 critical findings
+/cr                    # uncommitted working-tree changes
+/cr current            # current branch vs. its base, committed + uncommitted
+/cr staged             # staged changes only
+/cr main               # everything on this branch since main
+/cr HEAD~3             # last three commits
+/cr src/auth.ts        # specific files
+/cr main --fix         # review, then apply only 🔴 critical findings
 ```
 
 ## Layout
@@ -62,7 +71,7 @@ code-review-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json          # plugin manifest
 │   └── marketplace.json     # makes this dir installable as a marketplace
-├── commands/review.md
+├── commands/cr.md
 ├── agents/code-reviewer.md
 ├── skills/review-checklist/SKILL.md
 └── README.md
@@ -70,9 +79,8 @@ code-review-plugin/
 
 ## Publishing
 
-Push this directory as a git repo, then anyone can install it with:
+Push changes to `main` on [Web-pulse-cz/code-review-plugin](https://github.com/Web-pulse-cz/code-review-plugin). New installs use the `Install` command above; existing installs pick up the update with:
 
 ```bash
-claude plugin marketplace add <owner>/<repo>
-claude plugin install code-review-plugin@code-review-plugin
+claude plugin update code-review-plugin
 ```
