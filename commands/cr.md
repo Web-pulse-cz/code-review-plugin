@@ -10,11 +10,11 @@ Target: `$ARGUMENTS` (empty → uncommitted working-tree changes).
 
 ## Steps
 
-1. **Load project instructions.** Check the repo root for an `agents/` folder. If it exists, walk it fully — subfolders can nest subfolders to any depth, so glob `agents/**/*` (or `find agents -type f`) rather than listing just the top level — and read every file found. These are the project's own conventions and take priority over the generic dimensions in step 3 — a project rule beats a generic guideline when they conflict.
+1. **Load project instructions.** Check the repo root for an `agents/` folder. If it exists, walk it fully — subfolders can nest subfolders to any depth, so glob `agents/**/*` rather than listing just the top level — and read every file found. These are the project's own conventions and take priority over the generic dimensions in step 3 — a project rule beats a generic guideline when they conflict.
 
 2. **Resolve the diff.**
    - No args → `git status --short` then `git diff` (plus `git diff --staged`).
-   - `current` → the whole current branch, committed and uncommitted alike. Find the base (`git symbolic-ref refs/remotes/origin/HEAD` or fall back to `main`/`master`), then `git diff $(git merge-base HEAD <base>)` (two dots, base against the working tree — not `...HEAD`, which would drop uncommitted changes) plus `git status --short` for untracked files.
+   - `current` → the whole current branch, committed and uncommitted alike. Determine the base branch: run `git symbolic-ref -q --short refs/remotes/origin/HEAD` and strip the `origin/` prefix; a plain clone/fetch has no default set (this repo included), so when that returns nothing, check `git show-ref --verify -q refs/heads/main` — use `main` if it exists, else `master`. Then `git diff $(git merge-base HEAD <base>)` — a single ref against the working tree, no `..`/`...` — which is why it captures both commits since the merge-base and any uncommitted edits; do not use `<base>...HEAD`, which excludes uncommitted changes. Also run `git status --short` for untracked files.
    - `staged` → `git diff --staged`.
    - A branch name → `git diff $(git merge-base HEAD <branch>)...HEAD`.
    - A commit-ish (`HEAD~1`, sha) → `git diff <commit-ish>`.
@@ -23,7 +23,7 @@ Target: `$ARGUMENTS` (empty → uncommitted working-tree changes).
 
 3. **Read enough context.** For each changed hunk, read the surrounding function and its callers. A finding based only on the diff text is a guess — verify before reporting.
 
-4. **Review.** Delegate to the `code-reviewer` agent for anything over ~3 changed files, then relay its findings. Review dimensions, project rules from step 1 first:
+4. **Review.** Delegate to the `code-reviewer` agent for anything over ~3 changed files — hand it the diff you already resolved in step 2, not just the raw target string, so it doesn't re-derive it (and potentially pick the wrong dot form for `current`). Then relay its findings. Review dimensions, project rules from step 1 first:
    - **Project rules** — anything the change contradicts in the `agents/` instructions, if present.
    - **Correctness** — logic errors, off-by-one, wrong operator, null/undefined, unhandled error paths, race conditions.
    - **Security** — injection, missing authz check, secrets in code, unsafe deserialization, path traversal.
