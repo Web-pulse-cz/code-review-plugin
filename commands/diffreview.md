@@ -32,13 +32,13 @@ Target: `$ARGUMENTS` (empty → uncommitted working-tree changes).
    - **Tests** — new behavior with no test, or a test that cannot fail.
    - **Lint vs. project rules** — style/format the diff breaks that an explicit `agents/` rule calls out. No `agents/` rule on it → not a finding.
 
-5. **Report.** One line per finding, project-rule violations listed first:
+5. **Report.** Findings always in Czech — write every finding (summary, fix) in Czech regardless of the language the user wrote in. One line per finding, starting with the severity emoji, project-rule violations listed first:
 
    ```
-   path/to/file.ts:42  [🔴 critical] Token expiry uses `<` so a token expiring this second is accepted. Use `<=`.
+   🔴 path/to/file.ts:42  [critical] Token expiruje s `<`, takže token expirující právě teď je přijat. Použij `<=`.
    ```
 
-   Exactly four severity groups, every finding tagged with one:
+   Exactly four severity groups, every finding tagged with one, emoji first on the line:
 
    - 🔴 **critical** — wrong on a realistic input right now: data loss, auth bypass, prod breakage.
    - 🟡 **medium** — works today, but a real problem: edge case, missing test, perf/tech-debt risk.
@@ -54,3 +54,4 @@ Target: `$ARGUMENTS` (empty → uncommitted working-tree changes).
 - Report problems, not preferences. Skip formatting nits a linter would catch.
 - No praise, no summary of what the code does.
 - Never claim a bug without naming the input or sequence that triggers it.
+- All finding text is Czech — always, even if `$ARGUMENTS` or the conversation is in another language.

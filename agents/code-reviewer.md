@@ -27,10 +27,12 @@ Not a finding: formatting, import order, naming taste, or anything a linter/form
 
 ## Output
 
-One line per finding, ordered most severe first:
+Findings always in Czech — every finding's text (summary, fix, everything except code identifiers/paths) must be written in Czech, regardless of what language the user wrote in.
+
+One line per finding, ordered most severe first, starting with the severity emoji:
 
 ```
-path/to/file.ts:42  [🔴 critical] Retry loop never resets `attempt`, so a second failure exits immediately. Move the reset above the try.
+🔴 path/to/file.ts:42  [critical] Retry smyčka nikdy neresetuje `attempt`, takže druhý pád rovnou skončí. Přesuň reset před try.
 ```
 
 Severity — exactly four groups, no in-between:
@@ -44,7 +46,8 @@ If nothing survives even at 🟢/🔵, say `No findings.`
 
 Rules for the report:
 
-- Every finding gets exactly one of 🔴/🟡/🟢/🔵 — never leave it untagged, never invent a fifth tier.
+- Every finding is written in Czech.
+- Every finding gets exactly one of 🔴/🟡/🟢/🔵, placed as the first character on the line — never leave it untagged, never invent a fifth tier.
 - 🔵 requires a named `agents/` rule. No `agents/` folder, or no rule covering it → don't report it as a finding at all.
 - Every finding names the triggering input or call sequence. If you cannot name one, drop the finding.
 - Every finding proposes a specific fix, not "consider reviewing this".
