@@ -6,7 +6,7 @@ Structured code review for Claude Code. Reviews the current diff, a branch, or s
 
 | Piece | Type | Purpose |
 | --- | --- | --- |
-| `/cr` | command | Entry point. Loads project `agents/` rules if present, resolves the diff, reviews it, reports findings. `--fix` applies 🔴 critical ones. |
+| `/diffreview` | command | Entry point. Loads project `agents/` rules if present, resolves the diff, reviews it, reports findings. `--fix` applies 🔴 critical ones. |
 | `code-reviewer` | agent | Read-only reviewer. Auto-invoked for larger diffs, or callable directly. |
 | `review-checklist` | skill | Stack-specific failure modes (PHP, Symfony, Laravel, TS/React, SQL, shell). |
 
@@ -55,13 +55,13 @@ Edits to the files take effect on the next Claude Code session — no reinstall 
 ## Usage
 
 ```
-/cr                    # uncommitted working-tree changes
-/cr current            # current branch vs. its base, committed + uncommitted
-/cr staged             # staged changes only
-/cr main               # everything on this branch since main
-/cr HEAD~3             # last three commits
-/cr src/auth.ts        # specific files
-/cr main --fix         # review, then apply only 🔴 critical findings
+/diffreview                    # uncommitted working-tree changes
+/diffreview current            # current branch vs. its base, committed + uncommitted
+/diffreview staged             # staged changes only
+/diffreview main               # everything on this branch since main
+/diffreview HEAD~3             # last three commits
+/diffreview src/auth.ts        # specific files
+/diffreview main --fix         # review, then apply only 🔴 critical findings
 ```
 
 ## Layout
@@ -71,7 +71,7 @@ code-review-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json          # plugin manifest
 │   └── marketplace.json     # makes this dir installable as a marketplace
-├── commands/cr.md
+├── commands/diffreview.md
 ├── agents/code-reviewer.md
 ├── skills/review-checklist/SKILL.md
 └── README.md
