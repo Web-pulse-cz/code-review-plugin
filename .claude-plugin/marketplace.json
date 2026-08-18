@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "code-review-plugin",
+  "description": "Structured code review for the current diff, a branch, or specific files.",
+  "owner": {
+    "name": "Martin Hanzl",
+    "email": "martin.hanzl@blueghost.cz"
+  },
+  "plugins": [
+    {
+      "name": "code-review-plugin",
+      "description": "Severity-tagged review findings with concrete fixes, for a diff, branch, or file set.",
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}
