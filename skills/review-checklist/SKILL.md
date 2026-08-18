@@ -1,6 +1,6 @@
 ---
 name: review-checklist
-description: Language- and stack-specific review checklists (PHP/Laravel, TypeScript/React, SQL/migrations, shell). Use when reviewing code and you need to know which failure modes are worth checking for that specific stack, or when the user asks what to look for in a review.
+description: Language- and stack-specific review checklists (PHP, Symfony, Laravel, TypeScript/React, SQL/migrations, shell). Use when reviewing code and you need to know which failure modes are worth checking for that specific stack, or when the user asks what to look for in a review.
 ---
 
 # Review checklist
@@ -15,7 +15,27 @@ Load the section matching the changed files. Skip the rest.
 - Secrets: no key, token, or password literal. Check test fixtures too.
 - Deleted code: was the caller updated, or does something still reference it?
 
-## PHP / Laravel
+## PHP
+
+- Type juggling: loose `==`/`switch` on user input, or `in_array`/`array_search` without the strict flag.
+- Error suppression: `@` hiding a real failure instead of handling it.
+- Superglobals: `$_GET`/`$_POST`/`$_REQUEST` read directly instead of through validated/typed input.
+- Deserialization: `unserialize()` on user-controlled data (object injection) instead of `json_decode`.
+- Dynamic include/require path built from user input (LFI/RFI).
+- Autoload/namespace mismatch after a file move or rename — check `composer dump-autoload` isn't papering over it.
+
+## Symfony
+
+- Doctrine N+1: an entity relation (`OneToMany`/`ManyToOne`) accessed in a loop with no join fetch (DQL `JOIN`, `fetch: EAGER`, or explicit batch load).
+- Authorization: new controller action/route missing `#[IsGranted]`, a `security.yaml` `access_control` entry, or a Voter check.
+- Form binding: a Symfony Form mapped straight onto an entity with no DTO or explicit allowed-fields list, or `csrf_protection` disabled.
+- Validation: entity persisted/flushed before Validator constraints run.
+- Doctrine migrations: generated `down()` not hand-checked to be the true inverse of `up()`.
+- Query builder: user input concatenated into DQL instead of bound via `setParameter()`.
+- Services: new service without correct autowiring/visibility, or constructor injection forming a circular dependency.
+- Messenger: handler does non-idempotent work with no retry/dedup guard.
+
+## Laravel
 
 - Mass assignment: `$model->fill($request->all())` without `$fillable`/`$guarded` covering the new columns.
 - N+1: a relation accessed inside a loop with no `with()` eager load.

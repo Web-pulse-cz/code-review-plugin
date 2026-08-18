@@ -10,7 +10,9 @@ Target: `$ARGUMENTS` (empty → uncommitted working-tree changes).
 
 ## Steps
 
-1. **Resolve the diff.**
+1. **Load project instructions.** Check the repo root for an `agents/` folder. If it exists, walk it fully — subfolders can nest subfolders to any depth, so glob `agents/**/*` (or `find agents -type f`) rather than listing just the top level — and read every file found. These are the project's own conventions and take priority over the generic dimensions in step 3 — a project rule beats a generic guideline when they conflict.
+
+2. **Resolve the diff.**
    - No args → `git status --short` then `git diff` (plus `git diff --staged`).
    - `staged` → `git diff --staged`.
    - A branch name → `git diff $(git merge-base HEAD <branch>)...HEAD`.
@@ -18,26 +20,33 @@ Target: `$ARGUMENTS` (empty → uncommitted working-tree changes).
    - File paths → `git diff -- <paths>`; if the files are untracked, read them in full.
    - Empty diff → say so and stop. Do not invent a target.
 
-2. **Read enough context.** For each changed hunk, read the surrounding function and its callers. A finding based only on the diff text is a guess — verify before reporting.
+3. **Read enough context.** For each changed hunk, read the surrounding function and its callers. A finding based only on the diff text is a guess — verify before reporting.
 
-3. **Review.** Delegate to the `code-reviewer` agent for anything over ~3 changed files, then relay its findings. Review dimensions:
+4. **Review.** Delegate to the `code-reviewer` agent for anything over ~3 changed files, then relay its findings. Review dimensions, project rules from step 1 first:
+   - **Project rules** — anything the change contradicts in the `agents/` instructions, if present.
    - **Correctness** — logic errors, off-by-one, wrong operator, null/undefined, unhandled error paths, race conditions.
    - **Security** — injection, missing authz check, secrets in code, unsafe deserialization, path traversal.
    - **Contract breaks** — changed signature or return shape with un-updated callers, removed public API.
    - **Reuse** — reimplements something that already exists in the repo.
    - **Tests** — new behavior with no test, or a test that cannot fail.
+   - **Lint vs. project rules** — style/format the diff breaks that an explicit `agents/` rule calls out. No `agents/` rule on it → not a finding.
 
-4. **Report.** One line per finding:
+5. **Report.** One line per finding, project-rule violations listed first:
 
    ```
-   path/to/file.ts:42  [high] Token expiry uses `<` so a token expiring this second is accepted. Use `<=`.
+   path/to/file.ts:42  [🔴 critical] Token expiry uses `<` so a token expiring this second is accepted. Use `<=`.
    ```
 
-   Severities: `critical` (data loss, auth bypass, prod breakage) · `high` (wrong behavior on a realistic input) · `medium` (edge case, missing test) · `low` (clarity, naming).
+   Exactly four severity groups, every finding tagged with one:
+
+   - 🔴 **critical** — wrong on a realistic input right now: data loss, auth bypass, prod breakage.
+   - 🟡 **medium** — works today, but a real problem: edge case, missing test, perf/tech-debt risk.
+   - 🟢 **minor** — no functional risk: clarity, naming — informational only.
+   - 🔵 **lint** — style/lint violation against an explicit `agents/` rule. Requires a named rule; no `agents/` folder → this tier never fires.
 
    End with a one-line verdict. If nothing is wrong, say that plainly — do not pad the list.
 
-5. **`--fix`** — after reporting, apply only the `critical` and `high` findings, then show the diff. Leave the rest for the user to decide.
+6. **`--fix`** — after reporting, apply only the 🔴 `critical` findings, then show the diff. Leave 🟡, 🟢, and 🔵 for the user to decide.
 
 ## Rules
 
