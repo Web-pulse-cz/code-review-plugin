@@ -1,10 +1,10 @@
 {
   "name": "code-review-plugin",
-  "description": "Structured code review for the current diff, a branch, or specific files — severity-tagged findings with concrete fixes.",
-  "version": "0.1.0",
+  "description": "Structured code review for the current diff, a branch, individual commits, or specific files — severity-tagged findings with concrete fixes.",
+  "version": "0.2.0",
   "author": {
     "name": "Martin Hanzl",
     "email": "martin.hanzl@blueghost.cz"
   },
-  "keywords": ["code-review", "quality", "diff", "static-analysis"]
+  "keywords": ["code-review", "quality", "diff", "commits", "static-analysis"]
 }
